@@ -1,0 +1,15 @@
+{
+  "name": "project-euler",
+  "version": "1.0.0",
+  "description": "Literate Rosetta Stone Project Euler.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Ahmed Fasih",
+  "license": "Unlicense",
+  "devDependencies": {
+    "tape": "^4.6.3"
+  }
+}
