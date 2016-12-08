@@ -263,10 +263,11 @@ console.log('euler4', euler4());
 
 Well, with that JS, it’s easy:
 ~~~elm
-floorBase10Worker x powx =
-  if powx * 10 <= x then floorBase10Worker x (10 * powx) else powx
 floorBase10 x =
-  if x <= 0 then 0 else floorBase10Worker x 1
+  let loop x powx =
+      if powx * 10 <= x then loop x (10 * powx) else powx
+  in
+    if x <= 0 then 0 else loop x 1
 
 
 floorFloat : Float -> Float
@@ -279,18 +280,28 @@ isPalindromeWorker x floorPow10 =
     then True
     else
       let
-        firstDigit =
-          floorFloat (x / floorPow10)
-        lastDigit =
-          toFloat ((round x) % 10)
-        newx =
-          floorFloat ((x - firstDigit * floorPow10) / 10)
+        firstDigit = floorFloat (x / floorPow10)
+        lastDigit = toFloat ((round x) % 10)
+        newx = floorFloat ((x - firstDigit * floorPow10) / 10)
       in
         if firstDigit == lastDigit
           then isPalindromeWorker newx (floorPow10 / 100)
           else False
 isPalindrome x =
-  isPalindromeWorker x (floorBase10 x)
+  let loop x floorPow10 =
+    if floorPow10 < 1
+      then True
+      else
+        let
+          firstDigit = floorFloat (x / floorPow10)
+          lastDigit = toFloat ((round x) % 10)
+          newx = floorFloat ((x - firstDigit * floorPow10) / 10)
+        in
+          if firstDigit == lastDigit
+            then loop newx (floorPow10 / 100)
+            else False
+  in
+    loop x (floorBase10 x)
 ~~~
 Other than the float/int issues, this is fine. I need to practice this with another strongly-typed statically-typed language.
 
