@@ -24,7 +24,7 @@ t.run()
 console.log(`Problem 1: ${euler1(1000)}`);
 ~~~
 
-### Matlab/Octave
+### Octave/Matlab
 Matlab doesn’t allow you to define functions inside a single file, but Octave does, bless its cottonsocks!
 ~~~matlab
 % Octave ✅. Matlab you’ll have to save the function in a file, `euler1.m`.
@@ -97,7 +97,7 @@ Having too much fun with Elm to stop to make other implementations.
 >
 > What is the largest prime factor of the number 600851475143 ?
 
-### Matlab
+### Octave/Matlab
 ~~~matlab
 disp(max(factor(600851475143)))
 ~~~
@@ -148,7 +148,7 @@ I have to contort myself:
 >
 > Find the largest palindrome made from the product of two 3-digit numbers.
 
-### Matlab
+### Octave/Matlab
 ~~~matlab
 isPalindrome = @(s) strcmp(s, fliplr(s))
 
