@@ -168,6 +168,11 @@ Oops—only when I looked at the (prime) `factor`s of the `result` did I realize
 
 ### JavaScript
 ~~~js
+/**
+ * Number -> Number.
+ * @param  Number x
+ * @return Number   the largest power-of-ten smaller than x. 0 if x is negative
+ */
 function floorBase10(x) {
   // 2**52 ≈ 10**15 is biggest integer that has no gaps in double-precision, but
   // doubles can go to >=1e308.
@@ -184,22 +189,48 @@ function floorBase10(x) {
   }
   return floor;
 }
-
-function isPalindrome(x, debug = false) {
+/**
+ * Number -> Boolean. Checks if the positive integer part of the input is a
+ * palindrome with just arithmetic (not string conversions).
+ *
+ * Caveat: JavaScript numbers are (as of late-2016) 64-bit double-precision
+ * floating point numbers, and not all 64-bit integers can be represented as
+ * doubles. Specifically, integers bigger than `Math.pow(2, 52) - 1` are at risk
+ * of being non-existent as doubles. So if you type in 39393939393939393, this
+ * function will fail because the closest double to that is 39393939393939392.
+ *
+ * Implementation notes:
+ *
+ * With just floating point arithmetic (`+ - * /`, and `floor`), you can strip
+ * the first and last digits off a number, e.g., 12345 -> 234. This function
+ * iteratively does this, while checking if the first and last digits at each
+ * iteration are equal. At each iteration, you need to keep track of the largest
+ * power-of-ten less than the number, but with that as `floorPow10`, this is the
+ * math you need:
+ * - first digit of x = floor(x / floorPow10)
+ * - last digit of x = x % 10
+ * - x stripped of its first digit = x - floor(x / floorPow10) * floorPow10
+ * - x stripped of its last digit = floor(x / 10)
+ *
+ * @param  Number  x
+ * @param  {Boolean} [info=false] If truthy, printouts for each iteration
+ * @return {Boolean}
+ */
+function isPalindrome(x, info = false) {
   x = Math.floor(Math.abs(x));
 
   for (let j = floorBase10(x); j >= 1; j /= 100) {
     let firstDigit = Math.floor(x / j);
     let lastDigit = x % 10;
-    if (debug) {
+    if (info) {
       console.log('j', j, 'x', x, 'first', firstDigit, 'last', lastDigit,
                   'newx', Math.floor((x - Math.floor(x / j) * j) / 10));
     }
     if (firstDigit !== lastDigit) {
       return false;
     }
-    x = x - Math.floor(x / j) * j; // strip FIRST digit
-    x = Math.floor(x / 10);        // strip LAST digit
+    x = x - firstDigit * j; // strip FIRST digit
+    x = Math.floor(x / 10); // strip LAST digit
   }
   return true;
 }
