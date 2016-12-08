@@ -166,6 +166,69 @@ Again here I miss a “reduce from right but end early” function like Clojure 
 
 Oops—only when I looked at the (prime) `factor`s of the `result` did I realize that the question asked for palindrome products of two *three-digit* numbers. Luckily, the answer is the same. (I did a double-take because only one *prime* factor has three digits, but the product of two smaller ones yielded another tridigiter.)
 
+### JavaScript
+~~~js
+function floorBase10(x) {
+  // 2**52 ≈ 10**15 is biggest integer that has no gaps in double-precision, but
+  // doubles can go to >=1e308.
+  if (x <= 0) {
+    return 0;
+  }
+  let floor = 1;
+  for (let i = 1; i < 308; i++) {
+    if (floor * 10 <= x) { // this > vs < caused me ><
+      floor *= 10;
+    } else {
+      break;
+    }
+  }
+  return floor;
+}
+
+function isPalindrome(x, debug = false) {
+  x = Math.floor(Math.abs(x));
+
+  for (let j = floorBase10(x); j >= 1; j /= 100) {
+    let firstDigit = Math.floor(x / j);
+    let lastDigit = x % 10;
+    if (debug) {
+      console.log('j', j, 'x', x, 'first', firstDigit, 'last', lastDigit,
+                  'newx', Math.floor((x - Math.floor(x / j) * j) / 10));
+    }
+    if (firstDigit !== lastDigit) {
+      return false;
+    }
+    x = x - Math.floor(x / j) * j; // strip FIRST digit
+    x = Math.floor(x / 10);        // strip LAST digit
+  }
+  return true;
+}
+
+var t = tape("isPalindrome", test => {
+  [0, 1, 5, 101, 12021, 120021, 1200021, -101, -101.5, 101.5].forEach(
+      n => test.ok(isPalindrome(n)));
+  [39393939393939393, 10, 100, 1000].forEach(n => test.notOk(isPalindrome(n)));
+  test.end();
+});
+t.run();
+
+function euler4(numDigits = 3) {
+  const max1 = Math.pow(10, numDigits) - 1;
+  let bestPalindrome = 0;
+  for (let i = max1; i >= 100; i--) {
+    for (let j = max1; j >= 100; j--) {
+      const t = i * j;
+      if (t > bestPalindrome && isPalindrome(t)) {
+        bestPalindrome = t;
+      }
+    }
+  }
+  return bestPalindrome;
+}
+console.log('euler4', euler4());
+~~~
+
+
 ## Unused code
 ~~~js
 // Via http://stackoverflow.com/a/39930823/500207
@@ -215,4 +278,44 @@ var t = tape("regular operation", test => {
 t.run();
 ~~~
 
-asd
+~~~js
+function lengthNum(x) {
+  // 2**52 ≈ 10**15, but doubles can go to >=1e308.
+  let numDigits = 1;
+  for (let i = 10; i < 1e308; i *= 10) {
+    if (x > i) {
+      numDigits++;
+    } else {
+      break;
+    }
+  }
+  return numDigits;
+}
+~~~
+
+~~~js
+// Tricky buggers
+function euler4_wrong2(numDigits = 3) {
+  const max1 = Math.pow(10, numDigits);
+  let i, j;
+  for (i = max1; i >= 100; i--) {
+    for (j = max1; j >= 100; j--) {
+      if (isPalindrome(i * j)) {
+        break;
+      }
+    }
+  }
+  return i * j;
+}
+function euler4_wrong(numDigits = 3) {
+  const max1 = Math.pow(10, numDigits) - 1;
+  const maxProd = max1 * max1;
+  let i;
+  for (i = maxProd; i > 0; i--) {
+    if (isPalindrome(i)) {
+      break
+    };
+  }
+  return i;
+}
+~~~
