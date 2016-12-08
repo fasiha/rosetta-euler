@@ -160,7 +160,7 @@ I have to contort myself:
 ~~~matlab
 isPalindrome = @(s) strcmp(s, fliplr(s))
 
-mat = [2 : 999]' * [2 : 999];
+mat = [100 : 999]' * [100 : 999];
 vec = unique(mat(:));
 
 for i = fliplr(vec')
@@ -171,6 +171,8 @@ for i = fliplr(vec')
 end
 ~~~
 Again here I miss a “reduce from right but end early” function like Clojure has. Well, recursion.
+
+Oops—only when I looked at the (prime) `factor`s of the `result` did I realize that the question asked for palindrome products of two *three-digit* numbers. Luckily, the answer is the same. (I did a double-take because only one *prime* factor has three digits, but the product of two smaller ones yielded another tridigiter.)
 
 ## Unused code
 ~~~js
