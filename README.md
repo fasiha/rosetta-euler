@@ -151,6 +151,27 @@ I have to contort myself:
 - `floor : Float -> Int` and there’s no to-float version. There should be.
 - Mod and rem operate only on integers. 😳🙄😖.
 
+## Problem 4
+> A palindromic number reads the same both ways. The largest palindrome made from the product of two 2-digit numbers is 9009 = 91 × 99.
+>
+> Find the largest palindrome made from the product of two 3-digit numbers.
+
+### Matlab
+~~~matlab
+isPalindrome = @(s) strcmp(s, fliplr(s))
+
+mat = [2 : 999]' * [2 : 999];
+vec = unique(mat(:));
+
+for i = fliplr(vec')
+  if isPalindrome(sprintf('%d', i))
+    result = i;
+    break;
+  end
+end
+~~~
+Again here I miss a “reduce from right but end early” function like Clojure has. Well, recursion.
+
 ## Unused code
 ~~~js
 // Via http://stackoverflow.com/a/39930823/500207
