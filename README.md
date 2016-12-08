@@ -274,19 +274,6 @@ floorFloat : Float -> Float
 floorFloat x = toFloat (floor x)
 
 
-isPalindromeWorker : Float -> Float -> Bool
-isPalindromeWorker x floorPow10 =
-  if floorPow10 < 1
-    then True
-    else
-      let
-        firstDigit = floorFloat (x / floorPow10)
-        lastDigit = toFloat ((round x) % 10)
-        newx = floorFloat ((x - firstDigit * floorPow10) / 10)
-      in
-        if firstDigit == lastDigit
-          then isPalindromeWorker newx (floorPow10 / 100)
-          else False
 isPalindrome x =
   let loop x floorPow10 =
     if floorPow10 < 1
