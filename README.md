@@ -90,15 +90,7 @@ main =
   text (toString euler2 4000000)
 ~~~
 ### JS
-
-~~~js
-function fibs(n) {
-  let start = [ 1, 1 ];
-  return simpleRange(n - 2).reduce(
-      (l, _) => l.concat(l[l.length - 1] + l[l.length - 2]), start);
-}
-fibs(10);
-~~~
+Having too much fun with Elm to stop to make other implementations.
 
 ## Problem 3
 > The prime factors of 13195 are 5, 7, 13 and 29.
