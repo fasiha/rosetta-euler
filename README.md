@@ -305,7 +305,38 @@ isPalindrome x =
 ~~~
 Other than the float/int issues, this is fine. I need to practice this with another strongly-typed statically-typed language.
 
+### Haskell
+Not too hard:
+~~~haskell
+floorBase10 x =
+  let
+    loop x powx =
+      if powx * 10 <= x then loop x (10 * powx) else powx
+  in
+    if x <= 0 then 0 else loop x 1
 
+isPalindrome x =
+  let
+    loop x floorPow10 =
+      ((floorPow10 < 1) ||
+         (let firstDigit = div x floorPow10
+              lastDigit = x `mod` 10
+              newx = div (x - firstDigit * floorPow10) 10
+            in
+            (firstDigit == lastDigit) && loop newx (floorPow10 `div` 100)))
+  in
+    loop x (floorBase10 x)
+
+main :: IO ()
+main =
+  let
+    n = 12321
+  in
+    putStrLn (show n ++ " palindrome? " ++ show (isPalindrome n) )
+~~~
+It has integers, and big integers! And a `div` operator for integer division! That was easy, compared to Elm!
+
+Note: I use [Stack](https://haskell-lang.org/tutorial/stack-script): `$ stack exec -- ghc Pal.hs && ./Pal`.
 
 ## Unused code
 ~~~js
