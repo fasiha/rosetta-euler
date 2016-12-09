@@ -385,7 +385,7 @@ result = prod(minfactors)
 [lynn/elm-arithmetic’s `primeExponents`](http://package.elm-lang.org/packages/lynn/elm-arithmetic/2.0.2/Arithmetic#primeExponents) gives just the factors with their multiplicities, instead of just repeating repeated factors. This should help (and is why I’m doing Elm—I also don’t want to find a prime factorizer for Haskell or Rust). (I haven’t written any Rust for this yet.)
 
 ~~~elm
-import Html exposing (text)
+import Html
 import List
 import Dict
 import Arithmetic
@@ -415,7 +415,7 @@ euler5 nmax =
     loop 2 Dict.empty
       |> Dict.foldl (\factor mult accum -> accum * factor ^ mult) 1
 
-main = text (toString (euler5 20))
+main = Html.text (toString (euler5 20))
 ~~~
 So—confession time—as I was writing this, it used much less screenspace because I had most of it on one line (I didn’t want to risk `accumNew`’s definition breaking due to whitespace) and because I used `f`, `m`, `c`, and `d` instead of `factor`, `mult`, `currMult`, and `accumTemp`. At that point, I was kind of pleased: it wasn’t any worse than the Octave code above—it wasn’t ‘better’, it was differently good. Then I added whitespace and expressive names, and saw how much nesting there was really going on—as I was writing it, it was (and it remains, even now) very clear what needed to happen next, and so the entire `loop` recursion was very top-down indeed (which is a surprise, because I invariably do bottom-up; in this case, I only tried microscopic versions of pieces in the online Elm playground to make sure I was getting the syntax right). So, once you understand the many levels of looping needed by the algorithm, you can follow your way through the code. But *still*… there is a lot of code. As I was looking over the Octave code, before starting on the Elm code, I remember thinking, “All this ad hoccery, `needed` and `have`, obfuscating what the algorithm does. I bet a functional implementation will be more transparent, and let the algorithm shine through.” As might have been expected, that wasn’t true at all. I suspect this is more opaque. It’s not an Elm thing (the only Elmism is `Maybe`, which serves a critical purpose), it’s an immutable thing.
 
