@@ -341,6 +341,84 @@ isPalindromeInt x =
 ~~~
 This `Int`-only version is much more natural than the float-only version above. In Haskell, if we get a float, it can readily be converted to an `Integer` without loss of precision (and actually gaining precision, at the cost of runtime). In Elm, I have to choose the tortured `Float` version if I want 32-bit to 52-bit numbers, or use a less spiky `Int` version limited to 32 bits.
 
+## Problem 5
+> 2520 is the smallest number that can be divided by each of the numbers from 1 to 10 without any remainder.
+>
+> What is the smallest positive number that is evenly divisible by all of the numbers from 1 to 20?
+
+That’s really interesting. Check it:
+
+- factor(2) = [2]
+- factor(3) = [3]
+- factor(4) = [2, 2]
+- factor(5) = [5]
+- factor(6) = [2, 3]
+- factor(7) = [7]
+- factor(8) = [2, 2, 2]
+- factor(9) = [3, 3]
+- factor(10) = [2, 5]
+- factor(2520) = [2, 2, 2, 3, 3, 5, 7]
+
+I bet if you took the product of some kind of “cover set” of this set-of-sets (of factors of integers between 2 and 10, inclusive), you’d get 2520. After some poking around, this is indeed the case: each of these lists of prime factors is fully represented in 2520’s prime factors. That is, the solution only needs a single factor of 5 because for each number between 2 and 10, 5 only appears with multiplicity of 1—in each of them. (As to why this works… perhaps I do need to spend some minute–bytes on that: if each number’s list of prime factors is fully represented in the solution’s factors, down to multiplicities, then that number is a factor of the solution. Got it.)
+
+### Octave/Matlab
+(I’m using `octave-cli` throughout.) Here’s a clumsy approach—clumsy because it’s kind of tricky to emulate a “multiset” with just a list:
+
+~~~matlab
+Nmax = 20
+minfactors = [];
+for n = 2 : Nmax
+  factors = factor(n);
+  for f = unique(factors)
+    needed = sum(factors == f);
+    have = sum(minfactors == f);
+    if have ~= needed
+      minfactors = [minfactors, f * ones(1, needed - have)];
+    end
+  end
+end
+result = prod(minfactors)
+~~~
+
+### Elm
+
+[lynn/elm-arithmetic’s `primeExponents`](http://package.elm-lang.org/packages/lynn/elm-arithmetic/2.0.2/Arithmetic#primeExponents) gives just the factors with their multiplicities, instead of just repeating repeated factors. This should help (and is why I’m doing Elm—I also don’t want to find a prime factorizer for Haskell or Rust). (I haven’t written any Rust for this yet.)
+
+~~~elm
+import Html exposing (text)
+import List
+import Dict
+import Arithmetic
+
+euler5 nmax =
+  let
+    loop : Int -> Dict.Dict Int Int -> Dict.Dict Int Int
+    loop n accum =
+      if n > nmax
+        then accum
+        else
+          let
+            factors = Arithmetic.primeExponents n
+            accumNew = List.foldl
+              (\(factor, mult) accumTemp ->
+                Dict.update
+                  factor
+                  (\maybeCurrMult ->
+                    let currMult = Maybe.withDefault 0 maybeCurrMult
+                    in Just (if currMult >= mult then currMult else mult))
+                  accumTemp)
+              accum
+              factors
+          in
+            loop (1 + n) accumNew
+  in
+    loop 2 Dict.empty
+      |> Dict.foldl (\factor mult accum -> accum * factor ^ mult) 1
+
+main = text (toString (euler5 20))
+~~~
+So—confession time—as I was writing this, it used much less screenspace because I had most of it on one line (I didn’t want to risk `accumNew`’s definition breaking due to whitespace) and because I used `f`, `m`, `c`, and `d` instead of `factor`, `mult`, `currMult`, and `accumTemp`. At that point, I was kind of pleased: it wasn’t any worse than the Octave code above—it wasn’t ‘better’, it was differently good. Then I added whitespace and expressive names, and saw how much nesting there was really going on—as I was writing it, it was (and it remains, even now) very clear what needed to happen next, and so the entire `loop` recursion was very top-down indeed (which is a surprise, because I invariably do bottom-up; in this case, I only tried microscopic versions of pieces in the online Elm playground to make sure I was getting the syntax right). So, once you understand the many levels of looping needed by the algorithm, you can follow your way through the code. But *still*… there is a lot of code. As I was looking over the Octave code, before starting on the Elm code, I remember thinking, “All this ad hoccery, `needed` and `have`, obfuscating what the algorithm does. I bet a functional implementation will be more transparent, and let the algorithm shine through.” As might have been expected, that wasn’t true at all. I suspect this is more opaque. It’s not an Elm thing (the only Elmism is `Maybe`, which serves a critical purpose), it’s an immutable thing.
+
 ## Unused code
 ~~~js
 // Via http://stackoverflow.com/a/39930823/500207
