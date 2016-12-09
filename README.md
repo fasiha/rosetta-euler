@@ -405,7 +405,7 @@ euler5 nmax =
                   factor
                   (\maybeCurrMult ->
                     let currMult = Maybe.withDefault 0 maybeCurrMult
-                    in Just (if currMult >= mult then currMult else mult))
+                      in Just (if currMult >= mult then currMult else mult))
                   accumTemp)
               accum
               factors
