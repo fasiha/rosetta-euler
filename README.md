@@ -325,6 +325,22 @@ It has integers, and big integers! And a `div` operator for integer division! Th
 
 Note: I use [Stack](https://haskell-lang.org/tutorial/stack-script): `$ stack exec -- ghc Pal.hs && ./Pal`.
 
+Using this, I can update the Elm code a bit to use just Integers:
+~~~elm
+isPalindromeInt x =
+  let loop x floorPow10 =
+    (floorPow10 < 1) ||
+      let
+        firstDigit = x // floorPow10
+        lastDigit = x % 10
+        newx = (x - firstDigit * floorPow10) // 10
+      in
+        (firstDigit == lastDigit) && loop newx (floorPow10 // 100)
+  in
+    loop x (floorBase10 x)
+~~~
+This `Int`-only version is much more natural than the float-only version above. In Haskell, if we get a float, it can readily be converted to an `Integer` without loss of precision (and actually gaining precision, at the cost of runtime). In Elm, I have to choose the tortured `Float` version if I want 32-bit to 52-bit numbers, or use a less spiky `Int` version limited to 32 bits.
+
 ## Unused code
 ~~~js
 // Via http://stackoverflow.com/a/39930823/500207
