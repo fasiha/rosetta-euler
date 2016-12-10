@@ -390,36 +390,27 @@ import List
 import Dict
 import Arithmetic
 
-euler5 nmax =
+--- Many thanks to @folkertdev (Folkert de Vries) on Elm Slack for advice!
+updateFactorsDict n dict =
   let
-    loop : Int -> Dict.Dict Int Int -> Dict.Dict Int Int
-    loop n accum =
-      if n > nmax
-        then accum
-        else
-          let
-            factors = Arithmetic.primeExponents n
-            accumNew = List.foldl
-              (\(factor, mult) accumTemp ->
-                Dict.update
-                  factor
-                  (\maybeCurrMult ->
-                    let currMult = Maybe.withDefault 0 maybeCurrMult
-                      in Just (if currMult >= mult then currMult else mult))
-                  accumTemp)
-              accum
-              factors
-          in
-            loop (1 + n) accumNew
+    inner (factor, mult) dictTemp =
+      Dict.update factor (Maybe.withDefault 0 >> max mult >> Just) dictTemp
   in
-    loop 2 Dict.empty
-      |> Dict.foldl (\factor mult accum -> accum * factor ^ mult) 1
+    Arithmetic.primeExponents n
+      |> List.foldl inner dict
+
+
+euler5 nmax =
+  List.range 2 nmax
+    |> List.foldl updateFactorsDict Dict.empty
+    |> Dict.foldl (\factor mult accum -> accum * factor ^ mult) 1
+
 
 main = Html.text (toString (euler5 20))
 ~~~
-So—confession time—as I was writing this, it used much less screenspace because I had most of it on one line (I didn’t want to risk `accumNew`’s definition breaking due to whitespace) and because I used `f`, `m`, `c`, and `d` instead of `factor`, `mult`, `currMult`, and `accumTemp`. At that point, I was kind of pleased: it wasn’t any worse than the Octave code above—it wasn’t ‘better’, it was differently good. Then I added whitespace and expressive names, and saw how much nesting there was really going on—as I was writing it, it was (and it remains, even now) very clear what needed to happen next, and so the entire `loop` recursion was very top-down indeed (which is a surprise, because I invariably do bottom-up; in this case, I only tried microscopic versions of pieces in the online Elm playground to make sure I was getting the syntax right). So, once you understand the many levels of looping needed by the algorithm, you can follow your way through the code. But *still*… there is a lot of code. As I was looking over the Octave code, before starting on the Elm code, I remember thinking, “All this ad hoccery, `needed` and `have`, obfuscating what the algorithm does. I bet a functional implementation will be more transparent, and let the algorithm shine through.” As might have been expected, that wasn’t true at all. I suspect this is more opaque. It’s not an Elm thing (the only Elmism is `Maybe`, which serves a critical purpose), it’s an immutable thing.
+Slack user Elmlang/@folkertdev gave me valuable feedback on my initial version of this function and showed how it was equivalent to this much shorter one. It still uses a `Dict` whose `(key, value)` correspond to `(factor, multiplicity)`. The fold over `Dict` elements in the inner loop very tidily updates the multiplicity of factors when it’s not high enough (i.e., before reaching 8, the factor of 2 has only multiplicity of 2, but since 8=2*2*2, the value corresponding to the key of 2 is updated to 3). I think this tidier version much better expresses the underlying algorithm. The even the `Maybe` and `Just` Elm-isms are necessary since the key lookup might fail, meaning we’re encountering a new factor for the first time (i.e, 7 is first encountered at that element in the outer loop, like with all prime numbers).
 
-With all that said, the Elm code is basically doing the same thing as the Octave code above, except it’s using a `Dict`, a hash table mapping factors to multiplicities, instead of a vector of factors with repeats. I still think that data structure should make it clearer what’s going on, so maybe it’s my noob-ness at ML that makes the Elm look hard. (I do suspect that in general immutable forces more code.)
+Awesome!
 
 ## Unused code
 ~~~js
