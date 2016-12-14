@@ -408,7 +408,7 @@ euler5 nmax =
 
 main = Html.text (toString (euler5 20))
 ~~~
-Slack user Elmlang/@folkertdev gave me valuable feedback on my initial version of this function and showed how it was equivalent to this much shorter one. It still uses a `Dict` whose `(key, value)` correspond to `(factor, multiplicity)`. The fold over `Dict` elements in the inner loop very tidily updates the multiplicity of factors when it’s not high enough (i.e., before reaching 8, the factor of 2 has only multiplicity of 2, but since 8=2*2*2, the value corresponding to the key of 2 is updated to 3). I think this tidier version much better expresses the underlying algorithm. The even the `Maybe` and `Just` Elm-isms are necessary since the key lookup might fail, meaning we’re encountering a new factor for the first time (i.e, 7 is first encountered at that element in the outer loop, like with all prime numbers).
+Slack user Elmlang/@folkertdev gave me valuable feedback on my initial version of this function and showed how it was equivalent to this much shorter one. It still uses a `Dict` whose `(key, value)` correspond to `(factor, multiplicity)`. The fold over `Dict` elements in the inner loop very tidily updates the multiplicity of factors when it’s not high enough (i.e., before reaching 8, the factor of 2 has only multiplicity of 2, but since 8=2·2·2, the value corresponding to the key of 2 is updated to 3). I think this tidier version much better expresses the underlying algorithm. The even the `Maybe` and `Just` Elm-isms are necessary since the key lookup might fail, meaning we’re encountering a new factor for the first time (i.e, 7 is first encountered at that element in the outer loop, like with all prime numbers).
 
 Awesome!
 
