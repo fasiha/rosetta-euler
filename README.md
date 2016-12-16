@@ -1,4 +1,4 @@
-# Rosetta Stone: Project Euler
+# Rosetta Stone: [Project Euler](https://projecteuler.net/archives)
 
 ~~~js
 var tape = require("tape");
